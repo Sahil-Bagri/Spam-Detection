@@ -1,44 +1,47 @@
 import streamlit as st
 import pickle
 
-# Page config
+# Page configuration
 st.set_page_config(
-    page_title="Spam Or Not Spam Emails",
-    page_icon🗑️",
+    page_title="Spam Message Classifier",
+    page_icon="📩",
     layout="centered"
 )
 
-# Load model
+# Load trained model
 @st.cache_resource
 def load_model():
-    with open("model.pkl", "rb") as f:
-        model = pickle.load(f)
+    with open("spam.pkl", "rb") as file:   # ✅ changed here
+        model = pickle.load(file)
     return model
 
 model = load_model()
 
-# App title
-st.title("🗑️ Spam Or Not Spam Emails")
-st.write("Enter text or headline to classify it as **spam** or **ham**.")
+# App Title
+st.title("📩 Spam Message Classifier")
+st.subheader("Detect whether a message is **Spam** or **Not Spam**")
+
+st.write("Enter an SMS or text message below:")
 
 # Text input
-user_input = st.text_area(
-    "✍️ Enter Email Text Here:",
-    height=200,
-    placeholder="Type or paste news email..."
+message = st.text_area(
+    "✍️ Message Text",
+    height=150,
+    placeholder="Congratulations! You have won a free prize..."
 )
 
-# Prediction
-if st.button("🔍 Predict"):
-    if user_input.strip() == "":
-        st.warning("Please enter some text!")
+# Predict button
+if st.button("🔍 Check Message"):
+    if message.strip() == "":
+        st.warning("Please enter a message to classify.")
     else:
-        prediction = model.predict([user_input])[0]
+        prediction = model.predict([message])[0]
 
-        if prediction == 1 or prediction == "REAL":
-            st.success("✅ This news looks **ham**")
+        # Handle labels safely
+        if prediction == 1 or prediction == "spam":
+            st.error("🚨 This message is **SPAM**")
         else:
-            st.error("🚨 This news looks **spam**")
+            st.success("✅ This message is **NOT SPAM**")
 
 # Footer
 st.markdown("---")
